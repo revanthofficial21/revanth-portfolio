@@ -1,65 +1,129 @@
-import ProjectCard from "../components/ProjectCard"
+import { useEffect, useRef } from 'react'
+import ProjectCard from '../components/ProjectCard'
 
-export default function Projects() {
+export default function Projects({ data }) {
 
-  const projects = [
+  const headerRef = useRef(null)
+
+  useEffect(() => {
+
+    const o = new IntersectionObserver(([e]) => {
+
+      if (e.isIntersecting) {
+        e.target.classList.add('visible')
+        o.disconnect()
+      }
+
+    }, { threshold: 0.1 })
+
+    if (headerRef.current) o.observe(headerRef.current)
+
+    return () => o.disconnect()
+
+  }, [])
+
+
+  /* SAFE PROJECT DATA */
+
+  const safeData = data || [
+
     {
-      title: "SHARPOINT",
-      desc: "Student collaboration platform with real-time chat and opportunity hub.",
-      tech: "HTML • CSS • JavaScript • Firebase",
-      github: "#",
-      demo: "#",
-      image: "/projects/sharpoint.png"
+      id:1,
+      num:'01',
+      icon:'🌐',
+      title:'Sharpoint',
+      desc:'A student support platform connecting learners with opportunities, resources, and collaboration tools.',
+      stack:['React','Firebase','Node.js'],
+      demo:'#',
+      github:'https://github.com/revanthofficial21',
+      featured:true
     },
+
     {
-      title: "Budget Usage Alert System",
-      desc: "Cloud-based system that tracks expenses and sends alerts when limits exceed.",
-      tech: "AWS • Cloud Computing",
-      github: "#",
-      demo: "#",
-      image: "/projects/budget.png"
+      id:2,
+      num:'02',
+      icon:'💰',
+      title:'Budget Usage & Alert System',
+      desc:'Cloud-based system that tracks user spending and sends alerts when budgets are exceeded.',
+      stack:['Python','AWS','Flask'],
+      demo:'#',
+      github:'https://github.com/revanthofficial21'
     },
+
     {
-      title: "Developer Portfolio",
-      desc: "Modern portfolio website built using React, TailwindCSS and animations.",
-      tech: "React • TailwindCSS",
-      github: "#",
-      demo: "#",
-      image: "/projects/portfolio.png"
+      id:3,
+      num:'03',
+      icon:'📊',
+      title:'Personal Portfolio',
+      desc:'Modern developer portfolio built with React showcasing projects, skills, and certifications.',
+      stack:['React','Vite','CSS'],
+      demo:'#',
+      github:'https://github.com/revanthofficial21'
     }
+
   ]
+
 
   return (
 
-    <section id="projects" className="min-h-screen pt-28 pb-20 bg-slate-900">
+    <main
+      className="section"
+      style={{
+        paddingTop:'8rem',
+        position:'relative',
+        zIndex:1
+      }}
+    >
 
-      <div className="max-w-6xl mx-auto px-6">
+      {/* Header */}
 
-        <h2 className="text-4xl font-bold mb-12 text-center">
-          Projects
-        </h2>
+      <div ref={headerRef} className="reveal">
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="section-tag">Projects</div>
 
-          {projects.map((project, index) => (
-
-            <ProjectCard
-              key={index}
-              title={project.title}
-              desc={project.desc}
-              tech={project.tech}
-              github={project.github}
-              demo={project.demo}
-              image={project.image}
-            />
-
-          ))}
-
-        </div>
+        <h1 className="section-title">
+          Things I've <em>built</em>
+        </h1>
 
       </div>
 
-    </section>
 
+      {/* Projects Grid */}
+
+      <div
+        style={{
+          display:'grid',
+          gridTemplateColumns:'repeat(3,1fr)',
+          gap:'1.4rem'
+        }}
+        className="projects-grid"
+      >
+
+        {safeData.map((p, i) => (
+          <ProjectCard key={p.id} project={p} index={i} />
+        ))}
+
+      </div>
+
+
+      {/* Responsive */}
+
+      <style>
+        {`
+        @media(max-width:900px){
+
+          .projects-grid{
+            grid-template-columns:1fr!important;
+          }
+
+          .projects-grid article{
+            grid-column:span 1!important;
+          }
+
+        }
+        `}
+      </style>
+
+    </main>
   )
 }

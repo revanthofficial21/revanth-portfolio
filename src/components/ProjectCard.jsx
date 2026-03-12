@@ -1,62 +1,224 @@
-export default function ProjectCard({ title, desc, tech, github, demo, image }) {
+import { useRef } from 'react'
+
+export default function ProjectCard({ project = {}, index = 0 }) {
+
+  const cardRef = useRef(null)
+
+  // 3-D tilt on mouse move
+  const handleMove = (e) => {
+
+    const card = cardRef.current
+    if (!card) return
+
+    const { left, top, width, height } = card.getBoundingClientRect()
+
+    const x = (e.clientX - left) / width - 0.5
+    const y = (e.clientY - top) / height - 0.5
+
+    card.style.transform =
+      `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-6px)`
+  }
+
+  const handleLeave = () => {
+    if (cardRef.current) {
+      cardRef.current.style.transform = ''
+    }
+  }
 
   return (
 
-    <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-blue-400 transition duration-300">
+    <article
+      ref={cardRef}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
 
-      {/* Project Image */}
+      style={{
+        background: project?.featured
+          ? 'linear-gradient(135deg,rgba(108,99,255,.09) 0%,var(--card) 55%)'
+          : 'var(--card)',
 
-      {image && (
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-48 object-cover"
-        />
-      )}
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--r-lg)',
 
-      <div className="p-6">
+        padding: '2rem',
 
-        <h3 className="text-xl font-semibold text-blue-400 mb-3">
-          {title}
-        </h3>
+        display: 'flex',
+        flexDirection: 'column',
 
-        <p className="text-gray-400 mb-4 text-sm leading-relaxed">
-          {desc}
-        </p>
+        position: 'relative',
+        overflow: 'hidden',
 
-        <p className="text-xs text-gray-500 mb-4">
-          {tech}
-        </p>
+        gridColumn: project?.featured ? 'span 2' : 'span 1',
 
-        {/* Links */}
+        transition: 'border-color .3s, box-shadow .3s',
 
-        <div className="flex gap-4 text-sm">
+        willChange: 'transform',
+      }}
 
-          {github && (
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border-lit)'
+        e.currentTarget.style.boxShadow = '0 24px 60px rgba(0,0,0,.4)'
+      }}
+
+      onMouseLeaveCapture={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border)'
+        e.currentTarget.style.boxShadow = 'none'
+      }}
+    >
+
+      {/* Accent line */}
+
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          background: `linear-gradient(90deg, var(--accent), var(--accent2))`,
+          borderRadius: 'var(--r-lg) var(--r-lg) 0 0',
+          opacity: 0,
+          transition: 'opacity .35s',
+        }}
+        className="card-accent-line"
+      />
+
+
+
+      {/* Project Number */}
+
+      <span
+        style={{
+          fontFamily: 'Syne, sans-serif',
+          fontSize: '3.2rem',
+          fontWeight: 800,
+          color: 'rgba(108,99,255,.09)',
+          lineHeight: 1,
+          marginBottom: '.8rem',
+          userSelect: 'none',
+        }}
+      >
+        {project?.num || `0${index}`}
+      </span>
+
+
+
+      {/* Project Icon */}
+
+      <span style={{ fontSize: '2rem', marginBottom: '.8rem' }}>
+        {project?.icon || '💻'}
+      </span>
+
+
+
+      {/* Title */}
+
+      <h3
+        style={{
+          fontFamily: 'Syne, sans-serif',
+          fontSize: '1.15rem',
+          fontWeight: 700,
+          color: 'var(--text)',
+          letterSpacing: '-.02em',
+          marginBottom: '.55rem',
+        }}
+      >
+        {project?.title || 'Project Title'}
+      </h3>
+
+
+
+      {/* Description */}
+
+      <p
+        style={{
+          color: 'var(--muted)',
+          fontSize: '.87rem',
+          lineHeight: 1.7,
+          fontWeight: 300,
+          flex: 1,
+          marginBottom: '1.4rem',
+        }}
+      >
+        {project?.desc || 'Project description'}
+      </p>
+
+
+
+      {/* Tech Stack */}
+
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '.4rem',
+          marginBottom: '1.4rem'
+        }}
+      >
+        {(project?.stack ?? []).map((s) => (
+          <span key={s} className="chip">{s}</span>
+        ))}
+      </div>
+
+
+
+      {/* Links */}
+
+      <div style={{ display: 'flex', gap: '.9rem', marginTop: 'auto' }}>
+
+        {[
+          project?.demo && project.demo !== '#' && {
+            href: project.demo,
+            label: '↗ Live Demo'
+          },
+
+          project?.github && project.github !== '#' && {
+            href: project.github,
+            label: '⌥ GitHub'
+          },
+
+        ]
+          .filter(Boolean)
+          .map((l) => (
+
             <a
-              href={github}
+              key={l.label}
+              href={l.href}
               target="_blank"
-              className="text-blue-400 hover:underline"
-            >
-              GitHub
-            </a>
-          )}
+              rel="noreferrer"
 
-          {demo && (
-            <a
-              href={demo}
-              target="_blank"
-              className="text-blue-400 hover:underline"
-            >
-              Live Demo
-            </a>
-          )}
+              style={{
+                fontFamily: 'DM Mono, monospace',
+                fontSize: '.73rem',
+                color: 'var(--muted)',
+                transition: 'color .2s',
+              }}
 
-        </div>
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--accent)'
+              }}
+
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--muted)'
+              }}
+            >
+              {l.label}
+            </a>
+          ))}
 
       </div>
 
-    </div>
 
+
+      {/* Hover Accent */}
+
+      <style>
+        {`
+          .card-accent-line { opacity: 0 }
+          article:hover .card-accent-line { opacity: 1 }
+        `}
+      </style>
+
+    </article>
   )
 }
