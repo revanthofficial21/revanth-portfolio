@@ -5,7 +5,6 @@ function CertCard({ cert, delay }) {
   const ref = useRef(null)
 
   useEffect(() => {
-
     const o = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
@@ -17,84 +16,48 @@ function CertCard({ cert, delay }) {
     )
 
     const el = ref.current
-
     if (el) {
       el.style.transitionDelay = delay + 's'
       o.observe(el)
     }
 
     return () => o.disconnect()
-
   }, [delay])
 
   return (
-    <div ref={ref} className="reveal glass-card" style={{ padding: '1.5rem' }}>
+    <a
+      ref={ref}
+      href={cert.link || '#'}
+      target="_blank"
+      rel="noreferrer"
+      className="cert-card reveal"
+    >
 
-      <div
-        style={{
-          fontFamily: 'DM Mono,monospace',
-          fontSize: '.67rem',
-          color: 'var(--accent)',
-          letterSpacing: '.1em',
-          textTransform: 'uppercase',
-          marginBottom: '.6rem'
-        }}
-      >
+      <div className="cert-org">
         {cert.org}
       </div>
 
-      <div
-        style={{
-          fontFamily: 'Syne,sans-serif',
-          fontSize: '.92rem',
-          fontWeight: 700,
-          color: 'var(--text)',
-          lineHeight: 1.35,
-          marginBottom: '.4rem'
-        }}
-      >
+      <div className="cert-name">
         {cert.name}
       </div>
 
-      <div
-        style={{
-          fontFamily: 'DM Mono,monospace',
-          fontSize: '.67rem',
-          color: 'var(--muted)'
-        }}
-      >
+      <div className="cert-year">
         {cert.year}
       </div>
 
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '.3rem',
-          background: 'rgba(67,233,123,.1)',
-          border: '1px solid rgba(67,233,123,.2)',
-          borderRadius: 100,
-          padding: '.2rem .65rem',
-          fontFamily: 'DM Mono,monospace',
-          fontSize: '.62rem',
-          color: 'var(--accent3)',
-          marginTop: '.8rem'
-        }}
-      >
+      <div className="cert-badge">
         ✓ Verified
       </div>
 
-    </div>
+    </a>
   )
 }
-
 
 export default function Certifications({ data }) {
 
   const headerRef = useRef(null)
 
   useEffect(() => {
-
     const o = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
@@ -108,39 +71,37 @@ export default function Certifications({ data }) {
     if (headerRef.current) o.observe(headerRef.current)
 
     return () => o.disconnect()
-
   }, [])
-
-
-  /* SAFE DATA */
 
   const safeData = data || [
     {
       org: "Amazon Web Services",
       name: "AWS Cloud Practitioner Essentials",
-      year: "2025"
+      year: "2025",
+      link: "#"
     },
     {
       org: "Google",
       name: "Google Cloud Foundations",
-      year: "2025"
+      year: "2025",
+      link: "#"
     },
     {
       org: "Cisco",
       name: "Networking Essentials",
-      year: "2024"
+      year: "2024",
+      link: "#"
     },
     {
       org: "Infosys Springboard",
       name: "Python Programming Certification",
-      year: "2024"
+      year: "2024",
+      link: "#"
     }
   ]
 
-
   return (
-
-    <main className="section" style={{ paddingTop: '8rem', position: 'relative', zIndex: 1 }}>
+    <main className="section cert-section">
 
       <div ref={headerRef} className="reveal">
         <div className="section-tag">Certifications</div>
@@ -149,36 +110,11 @@ export default function Certifications({ data }) {
         </h1>
       </div>
 
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4,1fr)',
-          gap: '1.2rem'
-        }}
-        className="cert-grid"
-      >
+      <div className="cert-grid">
         {safeData.map((c, i) => (
           <CertCard key={i} cert={c} delay={i * 0.06} />
         ))}
       </div>
-
-
-      <style>
-        {`
-        @media(max-width:1100px){
-          .cert-grid{grid-template-columns:repeat(3,1fr)!important;}
-        }
-
-        @media(max-width:750px){
-          .cert-grid{grid-template-columns:repeat(2,1fr)!important;}
-        }
-
-        @media(max-width:500px){
-          .cert-grid{grid-template-columns:1fr!important;}
-        }
-        `}
-      </style>
 
     </main>
   )

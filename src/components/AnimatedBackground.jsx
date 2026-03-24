@@ -4,45 +4,79 @@ export default function AnimatedBackground() {
   const canvasRef = useRef(null)
 
   useEffect(() => {
-
     const canvas = canvasRef.current
     if (!canvas) return
 
     const ctx = canvas.getContext('2d')
 
-    let W = canvas.width = window.innerWidth
-    let H = canvas.height = window.innerHeight
+    let W = window.innerWidth
+    let H = window.innerHeight
+
     let offset = 0
-
-    const resize = () => {
-      W = canvas.width = window.innerWidth
-      H = canvas.height = window.innerHeight
-    }
-
-    window.addEventListener('resize', resize)
-
     let raf
 
-    const draw = () => {
+    // 🔥 Mouse Interaction
+    let mouse = { x: null, y: null }
 
+    const handleMouseMove = (e) => {
+      mouse.x = e.clientX
+      mouse.y = e.clientY
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+
+    // 🔥 Resize Handling + DPR Optimization
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1
+
+      W = window.innerWidth
+      H = window.innerHeight
+
+      canvas.width = W * dpr
+      canvas.height = H * dpr
+
+      canvas.style.width = `${W}px`
+      canvas.style.height = `${H}px`
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+
+    resize()
+    window.addEventListener('resize', resize)
+
+    const isMobile = window.innerWidth < 768
+
+    // 🔥 Animation Loop
+    const draw = () => {
       ctx.clearRect(0, 0, W, H)
 
-      const SIZE = 60
-      offset = (offset + 0.15) % SIZE
+      const SIZE = isMobile ? 80 : 60
+      offset = (offset + 0.2) % SIZE
 
-      ctx.strokeStyle = 'rgba(108,99,255,0.055)'
+      // 🌙 Dark / Light Mode Support
+      const isDark = document.body.classList.contains('dark')
+
+      ctx.strokeStyle = isDark
+        ? 'rgba(108,99,255,0.08)'
+        : 'rgba(0,0,0,0.05)'
+
       ctx.lineWidth = 1
-
       ctx.beginPath()
 
-      for (let x = -SIZE + (offset % SIZE); x < W + SIZE; x += SIZE) {
+      // Vertical lines
+      for (let x = -SIZE + offset; x < W + SIZE; x += SIZE) {
+        let distortion = mouse.x ? (mouse.x - x) * 0.002 : 0
+
         ctx.moveTo(x, 0)
-        ctx.lineTo(x, H)
+        ctx.lineTo(x + distortion, H)
       }
 
-      for (let y = -SIZE + (offset % SIZE); y < H + SIZE; y += SIZE) {
+      // Horizontal lines
+      for (let y = -SIZE + offset; y < H + SIZE; y += SIZE) {
+        let distortion = mouse.y ? (mouse.y - y) * 0.002 : 0
+
         ctx.moveTo(0, y)
-        ctx.lineTo(W, y)
+        ctx.lineTo(W, y + distortion)
       }
 
       ctx.stroke()
@@ -55,14 +89,13 @@ export default function AnimatedBackground() {
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', resize)
+      window.removeEventListener('mousemove', handleMouseMove)
     }
-
   }, [])
 
   return (
     <>
-      {/* Grid Background Canvas */}
-
+      {/* 🔥 Animated Grid Background */}
       <canvas
         ref={canvasRef}
         style={{
@@ -72,15 +105,13 @@ export default function AnimatedBackground() {
           pointerEvents: 'none',
 
           maskImage:
-            'radial-gradient(ellipse 80% 80% at 50% 40%,black 20%,transparent 90%)',
-
+            'radial-gradient(ellipse 80% 80% at 50% 40%, black 20%, transparent 90%)',
           WebkitMaskImage:
-            'radial-gradient(ellipse 80% 80% at 50% 40%,black 20%,transparent 90%)',
+            'radial-gradient(ellipse 80% 80% at 50% 40%, black 20%, transparent 90%)',
         }}
       />
 
-      {/* Purple Glow */}
-
+      {/* 🔥 Purple Glow */}
       <div
         style={{
           position: 'fixed',
@@ -93,16 +124,14 @@ export default function AnimatedBackground() {
           height: 'min(700px,70vw)',
 
           background:
-            'radial-gradient(circle,rgba(108,99,255,.18) 0%,transparent 70%)',
+            'radial-gradient(circle, rgba(108,99,255,0.18) 0%, transparent 70%)',
 
           borderRadius: '50%',
-
           animation: 'glow-pulse 7s ease-in-out infinite',
         }}
       />
 
-      {/* Pink Glow */}
-
+      {/* 🔥 Pink Glow */}
       <div
         style={{
           position: 'fixed',
@@ -115,10 +144,9 @@ export default function AnimatedBackground() {
           height: 'min(500px,50vw)',
 
           background:
-            'radial-gradient(circle,rgba(255,101,132,.1) 0%,transparent 70%)',
+            'radial-gradient(circle, rgba(255,101,132,0.1) 0%, transparent 70%)',
 
           borderRadius: '50%',
-
           animation: 'glow-pulse 10s ease-in-out infinite 3s',
         }}
       />

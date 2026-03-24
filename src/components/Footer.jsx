@@ -1,5 +1,3 @@
-import { NavLink } from 'react-router-dom'
-
 export default function Footer({ contact }) {
 
   const info = contact || {
@@ -8,78 +6,39 @@ export default function Footer({ contact }) {
     email: "revanthofficial21@gmail.com"
   }
 
-  return (
-    <footer style={{
-      padding: '2rem 7vw',
-      borderTop: '1px solid var(--border)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      flexWrap: 'wrap',
-      gap: '1rem',
-      position: 'relative',
-      zIndex: 10,
-    }}>
+  const socials = [
+    { label: '🐙', name: 'GitHub', href: info.github },
+    { label: '💼', name: 'LinkedIn', href: info.linkedin },
+    { label: '✉', name: 'Email', href: `mailto:${info.email}` },
+  ]
 
-      <p style={{
-        fontFamily: 'DM Mono, monospace',
-        fontSize: '.72rem',
-        color: 'var(--muted)'
-      }}>
-        Designed & Built by{' '}
-        <span style={{ color: 'var(--accent)' }}>
-          Revanth Kumar
-        </span>{' '}
+  return (
+    <footer className="footer">
+
+      {/* LEFT TEXT */}
+      <p className="footer-text">
+        Designed & Built by{" "}
+        <span className="gradient-text">Revanth Kumar</span>{" "}
         · 2026 · KL University · CSIT
       </p>
 
+      {/* SOCIAL ICONS */}
+      <div className="footer-icons">
 
-      <div style={{ display: 'flex', gap: '.7rem' }}>
-
-        {[
-          { label: 'GH', href: info.github },
-          { label: 'in', href: info.linkedin },
-          { label: '✉', href: `mailto:${info.email}` },
-        ].map(s => (
-
+        {socials.map((s) => (
           <a
-            key={s.label}
+            key={s.name}
             href={s.href}
             target="_blank"
             rel="noreferrer"
-            style={{
-              width: 36,
-              height: 36,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'var(--card)',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              color: 'var(--muted)',
-              fontFamily: 'DM Mono, monospace',
-              fontSize: '.75rem',
-              transition: 'all .2s',
-            }}
-
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = 'var(--accent)'
-              e.currentTarget.style.color = 'var(--accent)'
-              e.currentTarget.style.transform = 'translateY(-2px)'
-            }}
-
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = 'var(--border)'
-              e.currentTarget.style.color = 'var(--muted)'
-              e.currentTarget.style.transform = 'none'
-            }}
+            title={s.name}
           >
             {s.label}
           </a>
-
         ))}
 
       </div>
+
     </footer>
   )
 }
